@@ -68,7 +68,7 @@
 - `excel_to_csv_mapper.py`: GUI 로직이 포함된 메인 Python 스크립트입니다.
 - `README.md`: 프로젝트 개요와 사용법이 포함된 파일입니다.
 - `.gitignore`: Git이 무시할 파일과 디렉토리를 지정합니다.
-- `requirements.txt`: 필요한 의존성 목록을 포함한 파일입니다. (선택 사항)
+- `requirements.txt`: 필요한 의존성 목록을 포함한 파일입니다.
 
 ## 의존성
 
