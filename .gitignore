@@ -76,3 +76,6 @@ dist/
 
 # MacOS files
 .DS_Store
+
+# mappings saving file
+mappings.pkl
