@@ -79,3 +79,4 @@ dist/
 
 # mappings saving file
 mappings.pkl
+*.pkl
