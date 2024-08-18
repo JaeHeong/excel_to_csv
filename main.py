@@ -2,6 +2,7 @@ import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QMessageBox, QStackedWidget, QHBoxLayout
 from csv_converter import ExcelToCSVMapper
 from csv_deduplicator import CSVDeduplicator
+from csv_merger import CSVMerger  # CSV 병합 클래스를 import
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -26,7 +27,7 @@ class MainWindow(QWidget):
         hbox = QHBoxLayout()
         hbox.addStretch()
 
-        convert_button = QPushButton("CSV 변환툴")
+        convert_button = QPushButton("Excel → CSV 변환")
         convert_button.clicked.connect(self.show_converter)
         convert_button.setFixedSize(200, 50)  # 버튼 크기 조정
         hbox.addWidget(convert_button)
@@ -37,13 +38,24 @@ class MainWindow(QWidget):
         hbox2 = QHBoxLayout()
         hbox2.addStretch()
 
-        dedup_button = QPushButton("CSV 중복 제거")
+        dedup_button = QPushButton("CSV 중복 제거 및 추출")
         dedup_button.clicked.connect(self.show_deduplicator)
         dedup_button.setFixedSize(200, 50)  # 버튼 크기 조정
         hbox2.addWidget(dedup_button)
 
         hbox2.addStretch()
         button_layout.addLayout(hbox2)
+
+        hbox3 = QHBoxLayout()
+        hbox3.addStretch()
+
+        merge_button = QPushButton("CSV 병합")
+        merge_button.clicked.connect(self.show_merger)
+        merge_button.setFixedSize(200, 50)  # 버튼 크기 조정
+        hbox3.addWidget(merge_button)
+
+        hbox3.addStretch()
+        button_layout.addLayout(hbox3)
 
         main_layout.addStretch()
         main_layout.addLayout(button_layout)
@@ -60,14 +72,20 @@ class MainWindow(QWidget):
         self.deduplicator = CSVDeduplicator(parent=self)
         self.stack.addWidget(self.deduplicator)
 
+        # CSV 병합 위젯 추가
+        self.merger = CSVMerger(parent=self)
+        self.stack.addWidget(self.merger)
+
         self.setLayout(layout)
 
     def show_converter(self):
         self.stack.setCurrentWidget(self.converter)
 
     def show_deduplicator(self):
-        QMessageBox.information(self, "알림", "CSV 중복 제거 기능은 아직 구현되지 않았습니다.")
-        # self.stack.setCurrentWidget(self.deduplicator)
+        self.stack.setCurrentWidget(self.deduplicator)
+
+    def show_merger(self):
+        self.stack.setCurrentWidget(self.merger)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

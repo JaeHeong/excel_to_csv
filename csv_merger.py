@@ -5,11 +5,11 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt
 import csv
 
-class CSVDeduplicator(QWidget):
+class CSVMerger(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.setWindowTitle("CSV 중복 제거 by 김재형")
+        self.setWindowTitle("CSV 병합 by 김재형")
         self.setGeometry(100, 100, 800, 600)
 
         main_layout = QVBoxLayout()
@@ -17,14 +17,13 @@ class CSVDeduplicator(QWidget):
         # 홈 버튼
         home_button = QPushButton("Home")
         home_button.clicked.connect(self.go_home)
-        # home_button.setFixedSize(100, 40)  # 버튼 크기 조정
         main_layout.addWidget(home_button, alignment=Qt.AlignCenter)
 
         # 설명 라벨
         self.description_label = QLabel(
             "1. 첫 번째 CSV 파일을 선택하면 왼쪽에 표시됩니다.\n"
             "2. 두 번째 CSV 파일을 선택하면 오른쪽에 표시됩니다.\n"
-            "3. 중복 제거 또는 중복 추출 버튼을 클릭하여 결과를 저장하세요.",
+            "3. 병합 버튼을 클릭하여 결과를 저장하세요.",
             self
         )
         self.description_label.setAlignment(Qt.AlignLeft)
@@ -56,15 +55,10 @@ class CSVDeduplicator(QWidget):
         open_button_a.clicked.connect(self.open_csv_a)
         button_layout.addWidget(open_button_a, alignment=Qt.AlignCenter)
 
-        # 중복 제거 버튼
-        dedup_button = QPushButton("중복 제거")
-        dedup_button.clicked.connect(self.deduplicate_csv)
-        button_layout.addWidget(dedup_button, alignment=Qt.AlignCenter)
-
-        # 중복 추출 버튼
-        extract_button = QPushButton("중복 추출")
-        extract_button.clicked.connect(self.extract_duplicates)
-        button_layout.addWidget(extract_button, alignment=Qt.AlignCenter)
+        # 병합 버튼
+        merge_button = QPushButton("병합")
+        merge_button.clicked.connect(self.merge_csv)
+        button_layout.addWidget(merge_button, alignment=Qt.AlignCenter)
 
         # 두 번째 CSV 파일 선택 버튼
         open_button_b = QPushButton("두 번째 CSV 파일")
@@ -103,7 +97,7 @@ class CSVDeduplicator(QWidget):
         except Exception as e:
             QMessageBox.critical(self, "오류", f"CSV 파일을 불러오는데 실패했습니다: {e}")
 
-    def deduplicate_csv(self):
+    def merge_csv(self):
         if self.table_a.rowCount() == 0 or self.table_b.rowCount() == 0:
             QMessageBox.critical(self, "오류", "두 개의 CSV 파일을 모두 선택하세요.")
             return
@@ -112,36 +106,24 @@ class CSVDeduplicator(QWidget):
         df_b = self.get_df_from_table(self.table_b)
 
         try:
-            # 중복된 행 제거
-            df_result = df_a[~df_a.isin(df_b.to_dict(orient='list')).all(axis=1)]
+            # 공통 열을 기준으로 병합
+            common_columns = list(set(df_a.columns) & set(df_b.columns))
+            if not common_columns:
+                QMessageBox.critical(self, "오류", "두 CSV 파일에 공통 열이 없습니다.")
+                return
+            
+            df_merged = pd.merge(df_a, df_b, on=common_columns, how='outer')
+
+            # NaN 값을 빈 문자열로 대체
+            df_merged = df_merged.fillna("")
 
             # 결과 CSV 파일 저장
-            save_path, _ = QFileDialog.getSaveFileName(self, "결과 CSV 파일 저장", "", "CSV files (*.csv)")
+            save_path, _ = QFileDialog.getSaveFileName(self, "병합된 CSV 파일 저장", "", "CSV files (*.csv)")
             if save_path:
-                df_result.to_csv(save_path, index=False, quoting=csv.QUOTE_ALL, encoding='utf-8-sig')
-                QMessageBox.information(self, "성공", "중복 제거가 완료된 CSV 파일이 저장되었습니다!")
+                df_merged.to_csv(save_path, index=False, quoting=csv.QUOTE_ALL, encoding='utf-8-sig')
+                QMessageBox.information(self, "성공", "병합된 CSV 파일이 저장되었습니다!")
         except Exception as e:
-            QMessageBox.critical(self, "오류", f"CSV 파일을 처리하는데 실패했습니다: {e}")
-
-    def extract_duplicates(self):
-        if self.table_a.rowCount() == 0 or self.table_b.rowCount() == 0:
-            QMessageBox.critical(self, "오류", "두 개의 CSV 파일을 모두 선택하세요.")
-            return
-
-        df_a = self.get_df_from_table(self.table_a)
-        df_b = self.get_df_from_table(self.table_b)
-
-        try:
-            # 중복된 행 추출
-            df_duplicates = df_a[df_a.isin(df_b.to_dict(orient='list')).all(axis=1)]
-
-            # 결과 CSV 파일 저장
-            save_path, _ = QFileDialog.getSaveFileName(self, "중복된 부분 CSV 파일 저장", "", "CSV files (*.csv)")
-            if save_path:
-                df_duplicates.to_csv(save_path, index=False, quoting=csv.QUOTE_ALL, encoding='utf-8-sig')
-                QMessageBox.information(self, "성공", "중복된 부분이 저장된 CSV 파일이 생성되었습니다!")
-        except Exception as e:
-            QMessageBox.critical(self, "오류", f"CSV 파일을 처리하는데 실패했습니다: {e}")
+            QMessageBox.critical(self, "오류", f"CSV 파일을 병합하는데 실패했습니다: {e}")
 
     def get_df_from_table(self, table_widget):
         rows = table_widget.rowCount()

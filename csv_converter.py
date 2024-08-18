@@ -1,6 +1,6 @@
 import sys
 import pandas as pd
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QFileDialog, QMessageBox, QTableWidget, QTableWidgetItem
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QFileDialog, QMessageBox, QTableWidget, QTableWidgetItem
 from PyQt5.QtCore import Qt
 import csv
 import pickle
@@ -21,6 +21,17 @@ class ExcelToCSVMapper(QWidget):
         home_button = QPushButton("Home")
         home_button.clicked.connect(self.go_home)
         layout.addWidget(home_button, alignment=Qt.AlignCenter)
+
+        # 설명 라벨
+        self.description_label = QLabel(
+            "1. Excel 컬럼명 → CSV 컬럼명으로 변환되는 형태로 CSV파일이 생성됩니다.\n"
+            "2. CSV 생성 버튼을 누르고 변환할 엑셀 파일을 선택합니다.\n"
+            "3. 엑셀 파일을 선택하면 자동으로 CSV 파일을 변환 후 저장합니다.",
+            self
+        )
+        self.description_label.setAlignment(Qt.AlignLeft)
+        self.description_label.setStyleSheet("font-size: 14px; color: #333;")
+        layout.addWidget(self.description_label, alignment=Qt.AlignCenter)
 
         # 테이블 위젯 생성
         self.table = QTableWidget()
