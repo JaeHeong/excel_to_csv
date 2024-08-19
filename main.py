@@ -1,10 +1,20 @@
 import sys
+import os
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QMessageBox, QStackedWidget, QHBoxLayout, QSplashScreen
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt, QTimer
 from csv_converter import ExcelToCSVMapper
 from csv_deduplicator import CSVDeduplicator
 from csv_merger import CSVMerger  # CSV 병합 클래스를 import
+
+def resource_path(relative_path):
+    """ Get the absolute path to the resource, works for both development and PyInstaller. """
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -93,7 +103,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     # 스플래시 화면 설정
-    splash_pix = QPixmap("splash.png")  # 스플래시 화면으로 사용할 이미지 경로
+    splash_pix = QPixmap(resource_path("splash.png"))  # 스플래시 화면으로 사용할 이미지 경로
     splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
     splash.show()
 
