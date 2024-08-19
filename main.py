@@ -1,6 +1,6 @@
 import sys
 import os
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QMessageBox, QStackedWidget, QHBoxLayout, QSplashScreen
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QMessageBox, QStackedWidget, QHBoxLayout, QSplashScreen, QDesktopWidget
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt, QTimer
 from csv_converter import ExcelToCSVMapper
@@ -22,6 +22,7 @@ class MainWindow(QWidget):
 
         self.setWindowTitle("CSV 툴 by 김재형")
         self.setGeometry(100, 100, 800, 600)
+        self.center()  # 화면 중앙으로 이동
 
         # 스택 위젯 생성
         self.stack = QStackedWidget(self)
@@ -90,6 +91,13 @@ class MainWindow(QWidget):
 
         self.setLayout(layout)
 
+    def center(self):
+        """윈도우를 화면 중앙으로 이동"""
+        qr = self.frameGeometry()  # 창의 직사각형 위치 및 크기 정보 가져오기
+        cp = QDesktopWidget().availableGeometry().center()  # 화면의 중심점 가져오기
+        qr.moveCenter(cp)  # 창의 직사각형을 화면의 중심으로 이동
+        self.move(qr.topLeft())  # 창의 왼쪽 위를 화면의 중심으로 이동
+
     def show_converter(self):
         self.stack.setCurrentWidget(self.converter)
 
@@ -113,5 +121,8 @@ if __name__ == "__main__":
     # 스플래시 화면 표시 시간 (3초)
     QTimer.singleShot(3000, splash.close)  # 3초 후에 스플래시 화면 닫기
     QTimer.singleShot(3000, window.show)   # 3초 후에 메인 윈도우 표시
+
+    # 메인 윈도우를 최상위에 표시
+    QTimer.singleShot(3100, lambda: (window.raise_(), window.activateWindow()))
 
     sys.exit(app.exec_())
