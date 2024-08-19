@@ -52,7 +52,7 @@
    애플리케이션을 독립 실행형 `.exe` 파일로 배포하려면:
 
    ```bash
-   pyinstaller --onefile --windowed main.py
+   pyinstaller --onefile --windowed --add-data "splash.png;." main.py
    ```
 
    생성된 실행 파일은 `dist/` 디렉토리에서 찾을 수 있습니다.

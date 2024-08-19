@@ -1,5 +1,7 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QMessageBox, QStackedWidget, QHBoxLayout
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QMessageBox, QStackedWidget, QHBoxLayout, QSplashScreen
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import Qt, QTimer
 from csv_converter import ExcelToCSVMapper
 from csv_deduplicator import CSVDeduplicator
 from csv_merger import CSVMerger  # CSV 병합 클래스를 import
@@ -89,6 +91,17 @@ class MainWindow(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+
+    # 스플래시 화면 설정
+    splash_pix = QPixmap("splash.png")  # 스플래시 화면으로 사용할 이미지 경로
+    splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
+    splash.show()
+
+    # 메인 윈도우 설정
     window = MainWindow()
-    window.show()
+
+    # 스플래시 화면 표시 시간 (3초)
+    QTimer.singleShot(3000, splash.close)  # 3초 후에 스플래시 화면 닫기
+    QTimer.singleShot(3000, window.show)   # 3초 후에 메인 윈도우 표시
+
     sys.exit(app.exec_())
